@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Healthcare Provider Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="bg-canvas" aria-hidden="true">
+    <canvas id="helixCanvas"></canvas>
+    <div class="bg-gradient-orb orb1"></div>
+    <div class="bg-gradient-orb orb2"></div>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🧬</span>
+        <div>
+          <span class="logo-title">DNA<span class="accent">Crypto</span></span>
+          <span class="logo-sub">Healthcare Provider</span>
+        </div>
+      </div>
+      <div class="header-user">
+        <span class="user-name" id="userName">Dr. Sarah Johnson</span>
+        <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="dashboard-container">
+      
+      <div class="dashboard-header">
+        <h1>Send Encrypted Medical Report</h1>
+        <p>Securely encrypt and send patient medical reports using DNA-based encryption</p>
+      </div>
+
+      <div class="dashboard-grid">
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon enc">📄</div>
+            <div>
+              <h2 class="card-title">Upload Medical Report</h2>
+              <p class="card-sub">Select patient report to encrypt</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="label">Patient Name</label>
+            <input id="patientName" type="text" class="input" placeholder="Enter patient full name" />
+          </div>
+
+          <div class="form-group">
+            <label class="label">Patient Email</label>
+            <input id="patientEmail" type="email" class="input" placeholder="patient@email.com" />
+          </div>
+
+          <div class="form-group">
+            <label class="label">Report Type</label>
+            <select id="reportType" class="input">
+              <option value="blood_test">Blood Test</option>
+              <option value="xray">X-Ray</option>
+              <option value="mri">MRI Scan</option>
+              <option value="ct_scan">CT Scan</option>
+              <option value="lab_report">Lab Report</option>
+              <option value="prescription">Prescription</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="label">Upload Report (Image/PDF)</label>
+            <div class="file-drop img-drop" id="reportDrop" onclick="document.getElementById('reportInput').click()">
+              <div class="drop-content" id="reportDropContent">
+                <div class="drop-icon">📄</div>
+                <div>Click or drag medical report here</div>
+                <div class="drop-sub">Supported: PNG, JPG, PDF</div>
+              </div>
+              <img id="reportPreview" class="img-preview hidden" alt="Report" />
+              <input type="file" id="reportInput" accept="image/*,.pdf" style="display:none" onchange="previewReport(event)" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="label">Additional Notes (Optional)</label>
+            <textarea id="reportNotes" class="textarea" rows="3" placeholder="Any additional information for the patient..."></textarea>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="encryptReportBtn" onclick="encryptReport()">
+            <span class="btn-icon">🔐</span> Encrypt & Send Report
+          </button>
+
+          <div class="result-box hidden" id="encryptResult">
+            <div class="generated-key-box">
+              <div class="key-header">
+                <span class="key-icon">🔑</span>
+                <span class="key-title">Master Key Generated</span>
+              </div>
+              <div class="cloud-info">☁️ Report saved to secure cloud storage</div>
+              <div class="key-display" id="masterKeyDisplay"></div>
+              <div class="key-actions">
+                <button class="btn btn-secondary btn-sm" onclick="copyKey()">📋 Copy Key</button>
+                <button class="btn btn-secondary btn-sm" onclick="sendKeyToPatient()">📧 Send to Patient</button>
+              </div>
+              <div class="key-warning">
+                ⚠️ <strong>IMPORTANT:</strong> Share this key with the patient via secure channel (SMS/Email). 
+                They will need this key to decrypt and view their report.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background: rgba(0,229,255,0.12);">📊</div>
+            <div>
+              <h2 class="card-title">Recent Reports</h2>
+              <p class="card-sub">Your recently encrypted reports</p>
+            </div>
+          </div>
+
+          <div class="reports-list" id="reportsList">
+            <div class="report-item">
+              <div class="report-icon">🩺</div>
+              <div class="report-info">
+                <div class="report-name">Blood Test - John Doe</div>
+                <div class="report-date">Today, 10:30 AM</div>
+              </div>
+              <div class="report-status">✅ Sent</div>
+            </div>
+
+            <div class="report-item">
+              <div class="report-icon">🔬</div>
+              <div class="report-info">
+                <div class="report-name">Lab Report - Jane Smith</div>
+                <div class="report-date">Yesterday, 3:45 PM</div>
+              </div>
+              <div class="report-status">✅ Sent</div>
+            </div>
+
+            <div class="report-item">
+              <div class="report-icon">🏥</div>
+              <div class="report-info">
+                <div class="report-name">X-Ray - Mike Johnson</div>
+                <div class="report-date">2 days ago</div>
+              </div>
+              <div class="report-status">✅ Sent</div>
+            </div>
+
+            <div class="empty-state hidden">
+              <div class="empty-icon">📭</div>
+              <p>No reports sent yet</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loader-inner">
+      <div class="dna-loader">
+        <div class="dna-strand strand1"></div>
+        <div class="dna-strand strand2"></div>
+      </div>
+      <p id="loadingMsg">Processing…</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="sender-dashboard.js"></script>
+</body>
+</html>
